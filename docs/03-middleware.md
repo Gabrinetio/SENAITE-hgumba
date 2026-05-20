@@ -14,7 +14,7 @@ API Gateway que orquestra a integração entre o SENAITE LIS (Laboratório) e os
 
 ## Rotas
 
-### 1. SANDRA â†’ Middleware (Ingestão de Pedidos)
+### 1. SANDRA → Middleware (Ingestão de Pedidos)
 
 ```http
 POST /api/v1/sandra/ingestao
@@ -47,10 +47,10 @@ Accept: application/json
 **Fluxo interno (BackgroundTasks):**
 1. Validar elegibilidade no CADBEN
 2. Validar autorização no SIRE
-3. Mapear `codigo_catserv` â†’ UID AnalysisService (via tabela CATSERV no PostgreSQL)
+3. Mapear `codigo_catserv` → UID AnalysisService (via tabela CATSERV no PostgreSQL)
 4. Criar AnalysisRequest no SENAITE via `@@hgumba-create-ar` (bypass do `@@API/create` que bloqueia AR)
 
-### 2. SENAITE â†’ Middleware (Webhook Laudo Publicado)
+### 2. SENAITE → Middleware (Webhook Laudo Publicado)
 
 ```http
 POST /api/v1/senaite/webhook/laudo_publicado
@@ -158,25 +158,25 @@ GET /health
 ## Arquitetura
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     POST /api/v1/sandra/ingestao     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  SANDRA  â”‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º   â”‚                  â”‚
-â”‚ (Pront.) â”‚                                       â”‚   MIDDLEWARE     â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                       â”‚   FastAPI        â”‚
-                                                    â”‚   8000           â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     POST /api/v1/senaite/...          â”‚                  â”‚
-â”‚ SENAITE  â”‚ â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€   â”‚  â”Œâ”€ ingestao.py  â”‚
-â”‚ (LIS)    â”‚                                       â”‚  â”œâ”€ webhooks.py  â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                       â”‚  â”œâ”€ senaite_api  â”‚
-                                                    â”‚  â””â”€ exercito_api â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                                       â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-â”‚ CADBEN   â”‚ â—„â”€â”€â”€â”€â”€â”€â”€ GET /api/v1/beneficiarios            â”‚
-â”‚ (Elegib.)â”‚                                                â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                                                   â”‚  PostgreSQL        â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                                      â”‚  (CATSERV billing) â”‚
-â”‚  SIRE    â”‚ â—„â”€â”€â”€â”€â”€â”€â”€ GET /api/v1/guias           â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-â”‚ (Verba)  â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────┐     POST /api/v1/sandra/ingestao     ┌──────────────────┐
+│  SANDRA  │ ──────────────────────────────────►   │                  │
+│ (Pront.) │                                       │   MIDDLEWARE     │
+└──────────┘                                       │   FastAPI        │
+                                                    │   8000           │
+┌──────────┐     POST /api/v1/senaite/...          │                  │
+│ SENAITE  │ â—„──────────────────────────────────   │  ┌─ ingestao.py  │
+│ (LIS)    │                                       │  ├─ webhooks.py  │
+└──────────┘                                       │  ├─ senaite_api  │
+                                                    │  └─ exercito_api │
+┌──────────┐                                       └────────┬─────────┘
+│ CADBEN   │ â—„─────── GET /api/v1/beneficiarios            │
+│ (Elegib.)│                                                │
+└──────────┘                                     ┌──────────▼─────────┐
+                                                   │  PostgreSQL        │
+┌──────────┐                                      │  (CATSERV billing) │
+│  SIRE    │ â—„─────── GET /api/v1/guias           └────────────────────┘
+│ (Verba)  │
+└──────────┘
 ```
 
 ### Camadas
@@ -234,7 +234,7 @@ curl http://localhost:8000/health
 
 ## Próximos Passos
 
-1. **Mapeamento CATSERV**: Integrar tabela `tabela_catserv` do PostgreSQL para converter `codigo_catserv` â†’ UID/ID do AnalysisService no SENAITE.
+1. **Mapeamento CATSERV**: Integrar tabela `tabela_catserv` do PostgreSQL para converter `codigo_catserv` → UID/ID do AnalysisService no SENAITE.
 2. **Configurar Webhook no SENAITE**: Registrar o webhook `POST /api/v1/senaite/webhook/laudo_publicado` no Zope Management Interface (via `@@webhooks-controlpanel` ou ZCML).
 3. **Dockerizar**: `compose.middleware.yaml` com o middleware ao lado do SENAITE.
 4. **Autenticação SANDRA**: Quando API real for fornecida, substituir mocks por autenticação real.

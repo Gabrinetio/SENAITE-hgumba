@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Parser ASTM E1381/E1394 para interfaceamento com analisadores laboratoriais.
 

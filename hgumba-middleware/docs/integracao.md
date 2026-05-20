@@ -6,22 +6,22 @@
 
 ## Sumário
 
-1. [CATSERV â†’ SENAITE (Tabela de Exames)](#1-catserv--senaite-tabela-de-exames)
-2. [ASTM E1394 â†’ AmostraProcessada (Parser)](#2-astm-e1394--amostraprocessada-parser)
-3. [Portas TCP â†’ Equipamentos](#3-portas-tcp--equipamentos)
+1. [CATSERV → SENAITE (Tabela de Exames)](#1-catserv--senaite-tabela-de-exames)
+2. [ASTM E1394 → AmostraProcessada (Parser)](#2-astm-e1394--amostraprocessada-parser)
+3. [Portas TCP → Equipamentos](#3-portas-tcp--equipamentos)
 4. [Gateway API ” De/Para Completo](#4-gateway-api--depara-completo)
 5. [Pipeline de Dados (Campo a Campo)](#5-pipeline-de-dados-campo-a-campo)
 6. [Mocks e Dados de Teste](#6-mocks-e-dados-de-teste)
 
 ---
 
-## 1. CATSERV â†’ SENAITE (Dicionário de Conversão de Exames)
+## 1. CATSERV → SENAITE (Dicionário de Conversão de Exames)
 
 ### Origem: Tabela CATSERV (Exército ” Tabela de Custos)
 
 Cada exame no SANDRA é identificado por um **código CATSERV** (ex: `03.02.005`). Este código precisa ser convertido para a **Keyword** do AnalysisService no SENAITE antes de criar a AR ou receber resultados.
 
-### Dicionário de Conversão (CATSERV â†’ SENAITE)
+### Dicionário de Conversão (CATSERV → SENAITE)
 
 | CATSERV (SANDRA) | Exame | SENAITE Keyword | Object ID | Unidade | Observação |
 |------------------|-------|-----------------|-----------|---------|------------|
@@ -43,18 +43,18 @@ O fluxo esperado em produção:
 
 ```
 SANDRA envia: {"exames": [{"codigo_catserv": "03.02.005", ...}]}
-     â”‚
-     â–¼
+     │
+     ▼
 Middleware consulta PostgreSQL (tabela_catserv):
      SELECT senaite_keyword FROM tabela_catserv WHERE codigo = '03.02.005'
-     â†’ retorna 'GLI001'
-     â”‚
-     â–¼
+     → retorna 'GLI001'
+     │
+     ▼
 Middleware busca AnalysisService no SENAITE:
      GET /@@API/senaite/v1/search?portal_type=AnalysisService&getKeyword=GLI001
-     â†’ retorna UID do AnalysisService
-     â”‚
-     â–¼
+     → retorna UID do AnalysisService
+     │
+     ▼
 Cria AR com UID do serviço:
      POST @@hgumba-create-ar {"services": ["GLI001"], ...}
 ```
@@ -72,13 +72,13 @@ UPDATE tabela_catserv SET senaite_keyword = 'HEM001' WHERE codigo = '01.01.001';
 -- Demais exames requerem cadastro no SENAITE + mapeamento
 ```
 
-> **âš ï¸ Status atual:** A conversão CATSERV â†’ Keyword **ainda não está implementada** no middleware. O seed data usa Keywords diretamente (`GLI001`, `HEM001`) como se fossem códigos CATSERV. Para produção, implementar o lookup no PostgreSQL em `routers/ingestao.py` ou `clients/senaite_api.py`. 
+> **âš ï¸ Status atual:** A conversão CATSERV → Keyword **ainda não está implementada** no middleware. O seed data usa Keywords diretamente (`GLI001`, `HEM001`) como se fossem códigos CATSERV. Para produção, implementar o lookup no PostgreSQL em `routers/ingestao.py` ou `clients/senaite_api.py`. 
 > 
 > **Contorno temporário:** Configurar o SANDRA para enviar as Keywords do SENAITE (`GLI001`, `HEM001`) diretamente no campo `codigo_catserv` até o mapeamento via PostgreSQL ser implementado.
 
 ---
 
-## 2. ASTM E1394 â†’ AmostraProcessada (Parser)
+## 2. ASTM E1394 → AmostraProcessada (Parser)
 
 ### Visão Geral do Frame
 
@@ -221,7 +221,7 @@ AmostraProcessada(
 
 ---
 
-## 3. Portas TCP â†’ Equipamentos
+## 3. Portas TCP → Equipamentos
 
 ### Mapeamento (configurado em `instruments/config.py`)
 
@@ -238,36 +238,36 @@ Cada analisador deve ser configurado para enviar resultados ASTM para o IP do mi
 ### Topologia de Rede (Middleware Gateway)
 
 ```
-â”Œâ”€ Rede Laboratório â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚                                                                  â”‚
-â”‚   Analisadores                             Middleware (porta 8000)â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     TCP/IP:5001          â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
-â”‚   â”‚ Mindray BS200 â”‚â”€â”€â”€â”€ ENQ/ACK/STX/EOT â”€â”€â”€â–ºâ”‚                 â”‚  â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                          â”‚  listener.py    â”‚  â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     TCP/IP:5002          â”‚  (daemon TCP    â”‚  â”‚
-â”‚   â”‚ Sysmex XN550 â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚   assíncrono)   â”‚  â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                          â”‚                 â”‚  â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     TCP/IP:5003          â”‚  â”€â”€ parseia     â”‚  â”‚
-â”‚   â”‚ Cobas e411   â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚  â”€â”€ audita      â”‚  â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                          â”‚  â”€â”€ envia       â”‚  â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     TCP/IP:5004          â”‚       para      â”‚  â”‚
-â”‚   â”‚ Cobas c311   â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚    SENAITE      â”‚  â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                          â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     TCP/IP:5005                   â”‚           â”‚
-â”‚   â”‚ BioRad D10   â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º         â”‚           â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                   â”‚           â”‚
-â”‚                                                       â–¼           â”‚
-â”‚                                            â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  â”‚
-â”‚                                            â”‚  SENAITE LIMS   â”‚  â”‚
-â”‚                                            â”‚   port 8083     â”‚  â”‚
-â”‚                                            â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜  â”‚
-â”‚                                                                  â”‚
-â”‚   Gateway (porta 8000)                                           â”‚
-â”‚   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â” â”‚
-â”‚   â”‚ POST /api/v1/sandra/ingestao  â† SANDRA (prontuário)       â”‚ â”‚
-â”‚   â”‚ POST /api/v1/senaite/webhook/... â† SENAITE (laudo pub.)   â”‚ â”‚
-â”‚   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜ â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌─ Rede Laboratório ───────────────────────────────────────────────┐
+│                                                                  │
+│   Analisadores                             Middleware (porta 8000)│
+│   ┌──────────────┐     TCP/IP:5001          ┌─────────────────┐  │
+│   │ Mindray BS200 │──── ENQ/ACK/STX/EOT ───►│                 │  │
+│   └──────────────┘                          │  listener.py    │  │
+│   ┌──────────────┐     TCP/IP:5002          │  (daemon TCP    │  │
+│   │ Sysmex XN550 │─────────────────────────►│   assíncrono)   │  │
+│   └──────────────┘                          │                 │  │
+│   ┌──────────────┐     TCP/IP:5003          │  ── parseia     │  │
+│   │ Cobas e411   │─────────────────────────►│  ── audita      │  │
+│   └──────────────┘                          │  ── envia       │  │
+│   ┌──────────────┐     TCP/IP:5004          │       para      │  │
+│   │ Cobas c311   │─────────────────────────►│    SENAITE      │  │
+│   └──────────────┘                          └────────┬────────┘  │
+│   ┌──────────────┐     TCP/IP:5005                   │           │
+│   │ BioRad D10   │─────────────────────────►         │           │
+│   └──────────────┘                                   │           │
+│                                                       ▼           │
+│                                            ┌─────────────────┐  │
+│                                            │  SENAITE LIMS   │  │
+│                                            │   port 8083     │  │
+│                                            └─────────────────┘  │
+│                                                                  │
+│   Gateway (porta 8000)                                           │
+│   ┌────────────────────────────────────────────────────────────┐ │
+│   │ POST /api/v1/sandra/ingestao  ← SANDRA (prontuário)       │ │
+│   │ POST /api/v1/senaite/webhook/... ← SENAITE (laudo pub.)   │ │
+│   └────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 #### Configuração no Analisador
@@ -277,7 +277,7 @@ Cada equipamento deve ser configurado (via software do fabricante) com:
 | Parâmetro | Valor |
 |-----------|-------|
 | **IP destino** | IP do servidor middleware (`192.168.x.x` ” conforme rede do laboratório) |
-| **Porta** | Conforme tabela acima (5001“5005) |
+| **Porta** | Conforme tabela acima (5001–5005) |
 | **Protocolo** | ASTM E1381 (enquadramento) / E1394 (registros) |
 | **Handshake** | Hardware (ENQ/ACK) |
 | **Encoding** | ASCII |
@@ -305,7 +305,7 @@ Cada equipamento deve ser configurado (via software do fabricante) com:
 
 ### 4.1 `POST /api/v1/sandra/ingestao`
 
-> Entrada: SANDRA â†’ Middleware. Saída: CADBEN + SIRE + SENAITE.
+> Entrada: SANDRA → Middleware. Saída: CADBEN + SIRE + SENAITE.
 
 #### De/Para Campos
 
@@ -325,9 +325,9 @@ Cada equipamento deve ser configurado (via software do fabricante) com:
 
 ```
 OrdemServicoSANDRA
-  â”œâ”€â”€ CADBEN.validar_elegibilidade(cpf)       â†’  elegivel? (mock: sempre True)
-  â”œâ”€â”€ SIRE.validar_guia(id_pedido)            â†’  autorizada? (mock: sempre True)
-  â””â”€â”€ SENAITE.create_analysis_request(
+  ├── CADBEN.validar_elegibilidade(cpf)       →  elegivel? (mock: sempre True)
+  ├── SIRE.validar_guia(id_pedido)            →  autorizada? (mock: sempre True)
+  └── SENAITE.create_analysis_request(
         client_id="hgu",
         services=[codigos catserv...],
         doctor_name=medico_solicitante,
@@ -345,7 +345,7 @@ OrdemServicoSANDRA
 
 ### 4.2 `POST /api/v1/senaite/webhook/laudo_publicado`
 
-> Entrada: SENAITE â†’ Middleware (via Event Subscriber ZCML). Saída: SANDRA.
+> Entrada: SENAITE → Middleware (via Event Subscriber ZCML). Saída: SANDRA.
 
 #### Payload de Entrada (enviado pelo SENAITE)
 
@@ -362,19 +362,19 @@ OrdemServicoSANDRA
 
 ```python
 if payload.review_state != "published":
-    â†’ {"status": "ignorado", "motivo": "Apenas laudos publicados são processados"}
+    → {"status": "ignorado", "motivo": "Apenas laudos publicados são processados"}
 ```
 
 #### Ações Disparadas
 
 ```
 WebhookLaudoPayload
-  â”‚
-  â”œâ”€â”€ SENAITE.get_ar_pdf(ar_id)
-  â”‚     GET /clients/hgu/{analysis_request_id}/@@cdm-pdf
-  â”‚     â†’ bytes do PDF
-  â”‚
-  â””â”€â”€ SANDRA.notificar_sandra(ar_id, pdf_base64)
+  │
+  ├── SENAITE.get_ar_pdf(ar_id)
+  │     GET /clients/hgu/{analysis_request_id}/@@cdm-pdf
+  │     → bytes do PDF
+  │
+  └── SANDRA.notificar_sandra(ar_id, pdf_base64)
         POST /api/v1/resultados
         {
           "id_pedido": analysis_request_id,
@@ -445,7 +445,7 @@ Diferente do `@@API/create` (que usa `bika/lims/jsonapi/create.py` e explicitame
 
 1. Lê o JSON body
 2. Busca o Client por `client_id`
-3. Percorre `bika_setup.bika_analysisservices` procurando cada `Keyword` correspondente â†’ extrai UID
+3. Percorre `bika_setup.bika_analysisservices` procurando cada `Keyword` correspondente → extrai UID
 4. Chama `client.invokeFactory('AnalysisRequest', ar_id, Analyses=[...], Contact=...)`
 5. Seta `MedicalRecordNumber` e `PatientFullName` via `ar.getField()`
 6. `transaction.commit()`
@@ -463,81 +463,81 @@ Diferente do `@@API/create` (que usa `bika/lims/jsonapi/create.py` e explicitame
 
 ## 5. Pipeline de Dados (Campo a Campo)
 
-### Sentido: Analisador â†’ SENAITE
+### Sentido: Analisador → SENAITE
 
 ```
 Analisador (TCP:5001)
-  â”‚ ASTM Frame (STX/ETX/checksum)
-  â–¼
+  │ ASTM Frame (STX/ETX/checksum)
+  ▼
 listener.py :: AnalisadorTCP.alimentar()
-  â”‚ handshake ACK/NAK, valida checksum
-  â–¼
+  │ handshake ACK/NAK, valida checksum
+  ▼
 astm.py :: ASTM1394Parser.alimentar()
-  â”‚ decodifica registros H,P,O,R,L
-  â–¼
+  │ decodifica registros H,P,O,R,L
+  ▼
 AmostraProcessada (modelo)
-  â”œâ”€â”€ sample_id    â† O[2]
-  â”œâ”€â”€ machine_name â† do config (porta â†’ nome)
-  â”œâ”€â”€ patient_id   â† P[2]   â”€â”€â”€â”€â”€â”€â†’ DESCARTADO no envio
-  â”œâ”€â”€ patient_name â† P[3]   â”€â”€â”€â”€â”€â”€â†’ DESCARTADO
-  â””â”€â”€ resultados[]
-       â”œâ”€â”€ keyword  â† R[2] último elemento após ^^^
-       â”œâ”€â”€ valor    â† R[3]        â”€â”€â†’ SENAITE Result
-       â”œâ”€â”€ unidade  â† R[5]        â”€â”€â†’ DESCARTADO
-       â””â”€â”€ flag     â† R[7]        â”€â”€â†’ DESCARTADO
-  â–¼
+  ├── sample_id    ← O[2]
+  ├── machine_name ← do config (porta → nome)
+  ├── patient_id   ← P[2]   ──────→ DESCARTADO no envio
+  ├── patient_name ← P[3]   ──────→ DESCARTADO
+  └── resultados[]
+       ├── keyword  ← R[2] último elemento após ^^^
+       ├── valor    ← R[3]        ──→ SENAITE Result
+       ├── unidade  ← R[5]        ──→ DESCARTADO
+       └── flag     ← R[7]        ──→ DESCARTADO
+  ▼
 listener.py :: _enviar_para_senaite()
-  â”‚ Envia para SENAITE apenas: (sample_id, keyword, valor)
-  â–¼
+  │ Envia para SENAITE apenas: (sample_id, keyword, valor)
+  ▼
 senaite_api.py :: set_analysis_result()
-  â”‚ GET /@@API/senaite/v1/search?portal_type=Analysis&getKeyword={keyword}&parent_path=/senaite/clients/hgu/{sample_id}
-  â”‚ â†’ extrai uid do primeiro resultado
-  â”‚ POST /@@API/senaite/v1/update?uid={uid}&Result={valor}
-  â–¼
+  │ GET /@@API/senaite/v1/search?portal_type=Analysis&getKeyword={keyword}&parent_path=/senaite/clients/hgu/{sample_id}
+  │ → extrai uid do primeiro resultado
+  │ POST /@@API/senaite/v1/update?uid={uid}&Result={valor}
+  ▼
 SENAITE ” Analysis.Result atualizado
 ```
 
-### Sentido: SANDRA â†’ SENAITE (via Gateway)
+### Sentido: SANDRA → SENAITE (via Gateway)
 
 ```
 SANDRA (POST /api/v1/sandra/ingestao)
-  â”‚ JSON body: OrdemServicoSANDRA
-  â–¼
-validar_elegibilidade(CADBEN) â†’ True/False
-validar_guia(SIRE)             â†’ True/False
-  â–¼
+  │ JSON body: OrdemServicoSANDRA
+  ▼
+validar_elegibilidade(CADBEN) → True/False
+validar_guia(SIRE)             → True/False
+  ▼
 SENAITE.create_analysis_request()
-  â”‚ POST /@@hgumba-create-ar
-  â”‚   client_id     = "hgu"
-  â”‚   services      = [codigos catserv...]
-  â”‚   patient_name  = ordem.nome_paciente
-  â”‚   mrn           = ordem.cpf_paciente
-  â”‚   contact_id    = "contact-1"
-  â”‚   ar_id         = ordem.id_pedido
-  â”‚
-  â”‚ (BrowserView custom ” bypass do @@API/create)
-  â”‚   â†’ invokeFactory + setField + commit
-  â–¼
+  │ POST /@@hgumba-create-ar
+  │   client_id     = "hgu"
+  │   services      = [codigos catserv...]
+  │   patient_name  = ordem.nome_paciente
+  │   mrn           = ordem.cpf_paciente
+  │   contact_id    = "contact-1"
+  │   ar_id         = ordem.id_pedido
+  │
+  │ (BrowserView custom ” bypass do @@API/create)
+  │   → invokeFactory + setField + commit
+  ▼
 SENAITE ” AnalysisRequest criada em estado "sample_registered"
 ```
 
-### Sentido: SENAITE â†’ SANDRA (via Webhook)
+### Sentido: SENAITE → SANDRA (via Webhook)
 
 ```
 SENAITE (Event Subscriber ” IAfterTransitionEvent, state="published")
-  â”‚ POST async via urllib2 para:
-  â–¼
+  │ POST async via urllib2 para:
+  ▼
 POST /api/v1/senaite/webhook/laudo_publicado
-  â”‚ JSON body: WebhookLaudoPayload
-  â”‚ review_state == "published" ?
-  â–¼
+  │ JSON body: WebhookLaudoPayload
+  │ review_state == "published" ?
+  ▼
 get_ar_pdf(ar_id)
-  â”‚ GET /clients/hgu/{ar_id}/@@cdm-pdf
-  â”‚ â†’ PDF bytes â†’ base64
-  â–¼
+  │ GET /clients/hgu/{ar_id}/@@cdm-pdf
+  │ → PDF bytes → base64
+  ▼
 notificar_sandra(ar_id, pdf_base64)
-  â”‚ POST /api/v1/resultados (SANDRA)
-  â–¼
+  │ POST /api/v1/resultados (SANDRA)
+  ▼
 SANDRA ” laudo registrado no prontuário
 ```
 
@@ -658,23 +658,23 @@ Quando um resultado não aparece no SENAITE, siga estes passos:
 
 ```
 Passo 1: Verificar se o frame chegou ao daemon
-â””â”€ docker logs middleware_instruments 2>&1 | findstr "HGUMBA-Audit" | findstr "HGU-AR-001"
-   â”œâ”€ Se encontrar "resultado_importado" â†’ o parse funcionou, o SENAITE recebeu
-   â”œâ”€ Se encontrar "resultado_falha" â†’ o parse funcionou mas o envio falhou
-   â”‚    â””â”€ Ver o campo "erro" no audit_data:
-   â”‚       â”œâ”€ "Analysis not found" â†’ Keyword não existe no SENAITE
-   â”‚       â”œâ”€ "404" â†’ AR não encontrada (sample_id errado?)
-   â”‚       â””â”€ "Connection refused" â†’ SENAITE offline
-   â””â”€ Se NÃƒO encontrar â†’ o frame não chegou ou foi rejeitado no handshake
-        â””â”€ Verificar logs do analisador + conectividade TCP
+└─ docker logs middleware_instruments 2>&1 | findstr "HGUMBA-Audit" | findstr "HGU-AR-001"
+   ├─ Se encontrar "resultado_importado" → o parse funcionou, o SENAITE recebeu
+   ├─ Se encontrar "resultado_falha" → o parse funcionou mas o envio falhou
+   │    └─ Ver o campo "erro" no audit_data:
+   │       ├─ "Analysis not found" → Keyword não existe no SENAITE
+   │       ├─ "404" → AR não encontrada (sample_id errado?)
+   │       └─ "Connection refused" → SENAITE offline
+   └─ Se NÃƒO encontrar → o frame não chegou ou foi rejeitado no handshake
+        └─ Verificar logs do analisador + conectividade TCP
 
 Passo 2: Se há "resultado_falha", checar o campo audit_data.erro
 
 Passo 3: Verificar se a AR existe no SENAITE
-â””â”€ curl -u admin:admin "http://localhost:8083/senaite/@@API/senaite/v1/search?portal_type=AnalysisRequest&getId=HGU-AR-001"
+└─ curl -u admin:admin "http://localhost:8083/senaite/@@API/senaite/v1/search?portal_type=AnalysisRequest&getId=HGU-AR-001"
 
 Passo 4: Verificar se o AnalysisService existe
-â””â”€ curl -u admin:admin "http://localhost:8083/senaite/@@API/senaite/v1/search?portal_type=AnalysisService&getKeyword=GLI001"
+└─ curl -u admin:admin "http://localhost:8083/senaite/@@API/senaite/v1/search?portal_type=AnalysisService&getKeyword=GLI001"
 ```
 
 ### 7.5 Exemplos de JSON Reais e sua Interpretação

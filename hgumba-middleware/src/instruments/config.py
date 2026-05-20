@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from typing import List
 from instruments.models import InstrumentoConfig
 

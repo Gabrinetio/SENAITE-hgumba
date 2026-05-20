@@ -3,26 +3,26 @@
 Middleware de integração entre o **SENAITE LIMS** (Zope/Plone), **5 analisadores clínicos** (ASTM E1381/E1394, HL7 v2.x, RS-232) e os sistemas do **Exército Brasileiro** (SANDRA, SIRE, CADBEN).
 
 ```
-Analisadores (TCP:5001“5005)          SANDRA / SIRE / CADBEN (REST)
-       â”‚                                       â”‚
-       â–¼ ASTM / HL7 / RS-232                   â–¼ JSON API
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  instruments     â”‚                  â”‚  gateway           â”‚
-â”‚  daemon (async)  â”‚                  â”‚  FastAPI (porta    â”‚
-â”‚  listener.py     â”‚â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚  8000)             â”‚
-â”‚  astm/hl7/rs232  â”‚   JSON API v1    â”‚  ingestão +        â”‚
-â”‚  parsers         â”‚                  â”‚  webhooks          â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                  â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-                                               â”‚
-                                               â–¼
-                                        â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-                                        â”‚  SENAITE LIS     â”‚
-                                        â”‚  Zope/Plone      â”‚
-                                        â”‚  porta 8083      â”‚
-                                        â”‚  custom add-on   â”‚
-                                        â”‚  (cdm, report,   â”‚
-                                        â”‚   create-ar)     â”‚
-                                        â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+Analisadores (TCP:5001–5005)          SANDRA / SIRE / CADBEN (REST)
+       │                                       │
+       ▼ ASTM / HL7 / RS-232                   ▼ JSON API
+┌──────────────────┐                  ┌────────────────────┐
+│  instruments     │                  │  gateway           │
+│  daemon (async)  │                  │  FastAPI (porta    │
+│  listener.py     │─────────────────►│  8000)             │
+│  astm/hl7/rs232  │   JSON API v1    │  ingestão +        │
+│  parsers         │                  │  webhooks          │
+└──────────────────┘                  └────────┬───────────┘
+                                               │
+                                               ▼
+                                        ┌──────────────────┐
+                                        │  SENAITE LIS     │
+                                        │  Zope/Plone      │
+                                        │  porta 8083      │
+                                        │  custom add-on   │
+                                        │  (cdm, report,   │
+                                        │   create-ar)     │
+                                        └──────────────────┘
 ```
 
 ## Status do Projeto
@@ -56,7 +56,7 @@ A documentação completa está em [`docs/`](./docs/). Consulte conforme sua nec
 
 | Documento | Conteúdo |
 |-----------|----------|
-| [`docs/05-integracao.md`](./docs/05-integracao.md) | Manual de integração: CATSERV â†’ SENAITE, ASTM E1394 campo-a-campo, portas TCP, troubleshooting com audit logger |
+| [`docs/05-integracao.md`](./docs/05-integracao.md) | Manual de integração: CATSERV → SENAITE, ASTM E1394 campo-a-campo, portas TCP, troubleshooting com audit logger |
 | [`docs/03-middleware.md`](./docs/03-middleware.md) | Spec-first do middleware: rotas, contratos Pydantic, camadas internas |
 | [`docs/04-middleware-readme.md`](./docs/04-middleware-readme.md) | README do middleware: instalação, execução, testes, endpoints |
 | [`docs/requisitos_ti.md`](./docs/requisitos_ti.md) | Requisitos de integração pós-sigilo: endpoints CADBEN/SIRE/SANDRA, segurança, homologação |
@@ -79,7 +79,7 @@ A documentação completa está em [`docs/`](./docs/). Consulte conforme sua nec
 | Documento | Conteúdo |
 |-----------|----------|
 | [`docs/01-summary.md`](./docs/01-summary.md) | Progresso, lições aprendidas, critical context |
-| [`docs/10-sast-plano-correcao.md`](./docs/10-sast-plano-correcao.md) | Plano de correção SAST (Fases 1“4) |
+| [`docs/10-sast-plano-correcao.md`](./docs/10-sast-plano-correcao.md) | Plano de correção SAST (Fases 1–4) |
 
 ## Quick Start
 
@@ -106,7 +106,7 @@ A stack sobe 4 serviços:
 | `app` | SENAITE LIS (Zope/Plone) | `8083` |
 | `db` | PostgreSQL CATSERV | `5433` |
 | `middleware_gateway` | API Gateway FastAPI | `8000` |
-| `middleware_instruments` | Daemon TCP ASTM/HL7/RS232 | `5001“5005` |
+| `middleware_instruments` | Daemon TCP ASTM/HL7/RS232 | `5001–5005` |
 
 ### 2. Configurar o SENAITE
 
@@ -156,7 +156,7 @@ uv run pytest -v tests/test_astm_parser.py   # 25 testes ” parser ASTM
 uv run pytest -v tests/test_api.py           # 8 testes  ” endpoints REST
 uv run pytest -v tests/test_pipeline.py      # 4 testes  ” pipeline integrado
 uv run pytest -v tests/test_protocols.py     # 17 testes ” HL7 + RS232 parsers
-uv run pytest -v tests/test_security.py      # 54 testes ” SAST Fases 1“4
+uv run pytest -v tests/test_security.py      # 54 testes ” SAST Fases 1–4
 ```
 
 ### 6. Ambiente para Desenvolvimento
@@ -174,28 +174,28 @@ uv run uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
 
 ```
 SENAITE/
-â”œâ”€â”€ compose.yaml               # Stack Swarm de produção
-â”œâ”€â”€ compose.local.yaml         # Stack Docker Compose local (dev)
-â”œâ”€â”€ Dockerfile                 # Imagem SENAITE com add-on custom
-â”œâ”€â”€ .gitignore                 # ZODB, logs, .env, __pycache__
-â”œâ”€â”€ customizations/
-â”‚   â””â”€â”€ src/senaite/hgumba/    # Add-on Zope (Python 2.7)
-â”‚       â”œâ”€â”€ browser/views/     # cdm_view, report_view, create_ar, seed
-â”‚       â”œâ”€â”€ extensions/        # CoPhysiciansField (ISchemaExtender)
-â”‚       â””â”€â”€ configure.zcml     # Registro de views e permissions
-â”œâ”€â”€ hgumba-middleware/         # Middleware FastAPI (Python 3.12+)
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ main.py            # App FastAPI + middlewares
-â”‚   â”‚   â”œâ”€â”€ config.py          # Settings Pydantic v2
-â”‚   â”‚   â”œâ”€â”€ auth.py            # API Key header security
-â”‚   â”‚   â”œâ”€â”€ logger.py          # JSON audit trail (RDC 978)
-â”‚   â”‚   â”œâ”€â”€ clients/           # senaite_api, exercito_api
-â”‚   â”‚   â”œâ”€â”€ models/            # sandra, cadben, senaite (Pydantic)
-â”‚   â”‚   â”œâ”€â”€ routers/           # ingestao, webhooks
-â”‚   â”‚   â””â”€â”€ instruments/       # listener, runner, parser ASTM/HL7/RS232
-â”‚   â”œâ”€â”€ tests/                 # 108 testes (pytest)
-â”‚   â””â”€â”€ pyproject.toml         # uv: 5 deps runtime, 2 dev
-â””â”€â”€ docs/                      # Documentação completa
+├── compose.yaml               # Stack Swarm de produção
+├── compose.local.yaml         # Stack Docker Compose local (dev)
+├── Dockerfile                 # Imagem SENAITE com add-on custom
+├── .gitignore                 # ZODB, logs, .env, __pycache__
+├── customizations/
+│   └── src/senaite/hgumba/    # Add-on Zope (Python 2.7)
+│       ├── browser/views/     # cdm_view, report_view, create_ar, seed
+│       ├── extensions/        # CoPhysiciansField (ISchemaExtender)
+│       └── configure.zcml     # Registro de views e permissions
+├── hgumba-middleware/         # Middleware FastAPI (Python 3.12+)
+│   ├── src/
+│   │   ├── main.py            # App FastAPI + middlewares
+│   │   ├── config.py          # Settings Pydantic v2
+│   │   ├── auth.py            # API Key header security
+│   │   ├── logger.py          # JSON audit trail (RDC 978)
+│   │   ├── clients/           # senaite_api, exercito_api
+│   │   ├── models/            # sandra, cadben, senaite (Pydantic)
+│   │   ├── routers/           # ingestao, webhooks
+│   │   └── instruments/       # listener, runner, parser ASTM/HL7/RS232
+│   ├── tests/                 # 108 testes (pytest)
+│   └── pyproject.toml         # uv: 5 deps runtime, 2 dev
+└── docs/                      # Documentação completa
 ```
 
 ## Stack Técnica

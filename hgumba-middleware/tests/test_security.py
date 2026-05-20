@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Testes de segurança para correções SAST (docs/10-sast-plano-correcao.md)"""
 
 import pytest

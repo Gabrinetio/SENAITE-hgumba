@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Runner CLI para o Daemon de Instrumentos.
 

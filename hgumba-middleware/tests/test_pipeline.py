@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """Teste de integração: frames ASTM → parser → AmostraProcessada"""
 import pytest
 

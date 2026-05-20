@@ -11,53 +11,53 @@ Stack: **Python 3.12+ / FastAPI / httpx / Pydantic / uv**
 ## Arquitetura
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     ASTM E1381/E1394 (TCP)     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ Mindray  â”‚â”€â”€â”€â”€â”€ porta 5001 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚                   â”‚
-â”‚ BS-200   â”‚                                â”‚  INSTRUMENTS      â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤                                â”‚  Daemon TCP       â”‚
-â”‚ Sysmex   â”‚â”€â”€â”€â”€â”€ porta 5002 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚  (async)          â”‚
-â”‚ XN-550   â”‚                                â”‚                   â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤                                â”‚  â”Œâ”€ listener.py   â”‚
-â”‚ Roche    â”‚â”€â”€â”€â”€â”€ porta 5003 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚  â”œâ”€ astm.py       â”‚
-â”‚ Cobas411 â”‚                                â”‚  â””â”€ runner.py     â”‚
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤                                â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-â”‚ Roche    â”‚â”€â”€â”€â”€â”€ porta 5004 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º         â”‚
-â”‚ Cobas311 â”‚                                         â”‚ JSON API v1
-â”œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”¤                                         â–¼
-â”‚ Bio-Rad  â”‚â”€â”€â”€â”€â”€ porta 5005 â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º  â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚ D-10     â”‚                                â”‚  GATEWAY FastAPI   â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                â”‚  (porta 8000)     â”‚
-                                             â”‚                    â”‚
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  POST /api/v1/sandra/ingestao  â”‚  â”Œâ”€ ingestao.py   â”‚
-â”‚  SANDRA  â”‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–ºâ”‚  â”œâ”€ webhooks.py   â”‚
-â”‚ (Pront.) â”‚                                â”‚  â”œâ”€ senaite_api   â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                â”‚  â””â”€ exercito_api  â”‚
-                                             â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”  Webhook laudo_publicado               â”‚
-â”‚ SENAITE  â”‚ â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-â”‚ (LIS)    â”‚      JSON API v1 (search, update)
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
-       â”‚
-       â–¼
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚  CADBEN  â”‚     â”‚   SIRE   â”‚     â”‚PostgreSQLâ”‚
-â”‚(Elegib.) â”‚     â”‚ (Verba)  â”‚     â”‚(CATSERV) â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────┐     ASTM E1381/E1394 (TCP)     ┌───────────────────┐
+│ Mindray  │───── porta 5001 ──────────────►│                   │
+│ BS-200   │                                │  INSTRUMENTS      │
+├──────────┤                                │  Daemon TCP       │
+│ Sysmex   │───── porta 5002 ──────────────►│  (async)          │
+│ XN-550   │                                │                   │
+├──────────┤                                │  ┌─ listener.py   │
+│ Roche    │───── porta 5003 ──────────────►│  ├─ astm.py       │
+│ Cobas411 │                                │  └─ runner.py     │
+├──────────┤                                └────────┬──────────┘
+│ Roche    │───── porta 5004 ──────────────►         │
+│ Cobas311 │                                         │ JSON API v1
+├──────────┤                                         ▼
+│ Bio-Rad  │───── porta 5005 ──────────────►  ┌───────────────────┐
+│ D-10     │                                │  GATEWAY FastAPI   │
+└──────────┘                                │  (porta 8000)     │
+                                             │                    │
+┌──────────┐  POST /api/v1/sandra/ingestao  │  ┌─ ingestao.py   │
+│  SANDRA  │ ──────────────────────────────►│  ├─ webhooks.py   │
+│ (Pront.) │                                │  ├─ senaite_api   │
+└──────────┘                                │  └─ exercito_api  │
+                                             └────────┬───────────┘
+┌──────────┐  Webhook laudo_publicado               │
+│ SENAITE  │ â—„───────────────────────────────────────┘
+│ (LIS)    │      JSON API v1 (search, update)
+└──────────┘
+       │
+       ▼
+┌──────────┐     ┌──────────┐     ┌──────────┐
+│  CADBEN  │     │   SIRE   │     │PostgreSQL│
+│(Elegib.) │     │ (Verba)  │     │(CATSERV) │
+└──────────┘     └──────────┘     └──────────┘
 ```
 
 ### Duas Aplicações
 
 | Processo | Entry Point | Responsabilidade | Portas |
 |----------|-------------|------------------|--------|
-| **Gateway** | `uv run gateway` | API REST (SANDRA â†’ SENAITE, webhooks) | 8000 |
-| **Instrumentos** | `uv run instrumentos` | Daemon TCP (5 analisadores â†’ SENAITE) | 5001-5005 |
+| **Gateway** | `uv run gateway` | API REST (SANDRA → SENAITE, webhooks) | 8000 |
+| **Instrumentos** | `uv run instrumentos` | Daemon TCP (5 analisadores → SENAITE) | 5001-5005 |
 
 ### Camadas Internas
 
 | Camada | Módulo | Função |
 |--------|--------|--------|
-| Router | `routers/ingestao.py` | Endpoints SANDRA â†’ SENAITE |
-| Router | `routers/webhooks.py` | Webhooks SENAITE â†’ SANDRA |
+| Router | `routers/ingestao.py` | Endpoints SANDRA → SENAITE |
+| Router | `routers/webhooks.py` | Webhooks SENAITE → SANDRA |
 | Client | `clients/senaite_api.py` | HTTP async para API do SENAITE |
 | Client | `clients/exercito_api.py` | HTTP async para SANDRA/CADBEN/SIRE (mocks) |
 | Model | `models/sandra.py`, `models/cadben.py`, `models/senaite.py` | Schemas Pydantic |
@@ -175,7 +175,7 @@ uv run python tests/mock_instrument.py --port 5001 --machine Mindray_BS200 \
 
 ```bash
 curl http://localhost:8000/health
-# â†’ {"status":"healthy","service":"hgumba-middleware","version":"1.0.0"}
+# → {"status":"healthy","service":"hgumba-middleware","version":"1.0.0"}
 ```
 
 ---
@@ -223,35 +223,35 @@ Protocolo: ASTM E1381 (enquadramento) + E1394 (registros H/P/O/R/C/L) sobre TCP/
 
 ```
 hgumba-middleware/
-â”œâ”€â”€ src/
-â”‚   â”œâ”€â”€ main.py                  # FastAPI app, entrada do gateway
-â”‚   â”œâ”€â”€ config.py                # Settings via .env / variáveis de ambiente
-â”‚   â”œâ”€â”€ clients/
-â”‚   â”‚   â”œâ”€â”€ senaite_api.py       # httpx AsyncClient para API SENAITE
-â”‚   â”‚   â””â”€â”€ exercito_api.py      # httpx AsyncClient para SANDRA/CADBEN/SIRE
-â”‚   â”œâ”€â”€ models/
-â”‚   â”‚   â”œâ”€â”€ sandra.py            # OrdemServicoSANDRA, ExameSolicitado
-â”‚   â”‚   â”œâ”€â”€ cadben.py            # BeneficiarioCADBEN, ElegibilidadeResponse
-â”‚   â”‚   â””â”€â”€ senaite.py           # WebhookLaudoPayload, AnalysisRequestPayload
-â”‚   â”œâ”€â”€ routers/
-â”‚   â”‚   â”œâ”€â”€ ingestao.py          # POST /api/v1/sandra/ingestao
-â”‚   â”‚   â””â”€â”€ webhooks.py          # POST /api/v1/senaite/webhook/laudo_publicado
-â”‚   â””â”€â”€ instruments/
-â”‚       â”œâ”€â”€ config.py            # 5 instrumentos configurados
-â”‚       â”œâ”€â”€ models.py            # AmostraProcessada, ResultadoExameInstrumento
-â”‚       â”œâ”€â”€ listener.py          # TCP async server com handshake ACK/NAK/ENQ/EOT
-â”‚       â”œâ”€â”€ runner.py            # CLI daemon (entry point "instrumentos")
-â”‚       â””â”€â”€ protocols/
-â”‚           â””â”€â”€ astm.py          # Parser ASTM E1381/E1394
-â”œâ”€â”€ tests/
-â”‚   â”œâ”€â”€ test_astm_parser.py      # 25 testes do parser ASTM
-â”‚   â”œâ”€â”€ test_api.py              # 9 testes da API (health, webhook, sandra)
-â”‚   â”œâ”€â”€ test_pipeline.py         # 5 testes de integração (emulador â†’ parse â†’ dados)
-â”‚   â””â”€â”€ mock_instrument.py       # Emulador ASTM CLI
-â”œâ”€â”€ Dockerfile                   # python:3.12-slim + uv sync
-â”œâ”€â”€ pyproject.toml               # uv: 5 deps runtime, 2 deps dev
-â”œâ”€â”€ .env.example                 # Template de variáveis de ambiente
-â””â”€â”€ spec-middleware.md           # Spec-first do projeto
+├── src/
+│   ├── main.py                  # FastAPI app, entrada do gateway
+│   ├── config.py                # Settings via .env / variáveis de ambiente
+│   ├── clients/
+│   │   ├── senaite_api.py       # httpx AsyncClient para API SENAITE
+│   │   └── exercito_api.py      # httpx AsyncClient para SANDRA/CADBEN/SIRE
+│   ├── models/
+│   │   ├── sandra.py            # OrdemServicoSANDRA, ExameSolicitado
+│   │   ├── cadben.py            # BeneficiarioCADBEN, ElegibilidadeResponse
+│   │   └── senaite.py           # WebhookLaudoPayload, AnalysisRequestPayload
+│   ├── routers/
+│   │   ├── ingestao.py          # POST /api/v1/sandra/ingestao
+│   │   └── webhooks.py          # POST /api/v1/senaite/webhook/laudo_publicado
+│   └── instruments/
+│       ├── config.py            # 5 instrumentos configurados
+│       ├── models.py            # AmostraProcessada, ResultadoExameInstrumento
+│       ├── listener.py          # TCP async server com handshake ACK/NAK/ENQ/EOT
+│       ├── runner.py            # CLI daemon (entry point "instrumentos")
+│       └── protocols/
+│           └── astm.py          # Parser ASTM E1381/E1394
+├── tests/
+│   ├── test_astm_parser.py      # 25 testes do parser ASTM
+│   ├── test_api.py              # 9 testes da API (health, webhook, sandra)
+│   ├── test_pipeline.py         # 5 testes de integração (emulador → parse → dados)
+│   └── mock_instrument.py       # Emulador ASTM CLI
+├── Dockerfile                   # python:3.12-slim + uv sync
+├── pyproject.toml               # uv: 5 deps runtime, 2 deps dev
+├── .env.example                 # Template de variáveis de ambiente
+└── spec-middleware.md           # Spec-first do projeto
 ```
 
 ---
@@ -286,7 +286,7 @@ Gerenciadas exclusivamente via `uv add` / `uv sync` ” sem `pip install` manual
 ## Notas Operacionais
 
 - **APIs Exército**: SANDRA, CADBEN e SIRE estão em modo mock até assinatura de termo de sigilo.
-- **CATSERV**: PostgreSQL com tabela `tabela_catserv` mapeia códigos de exame â†’ UIDs do SENAITE.
+- **CATSERV**: PostgreSQL com tabela `tabela_catserv` mapeia códigos de exame → UIDs do SENAITE.
 - **Volume ZODB**: O banco do SENAITE (`Data.fs`) persiste em volume nomeado `senaite_data:/data`.
 - **Buildout**: Não use `SITE=senaite` em restarts ” destrói `package-includes/` do add-on custom.
 - **Webhook SENAITE**: Implementado via Event Subscriber ZCML (não painel webhooks). Dispara POST para o gateway ao publicar laudo.

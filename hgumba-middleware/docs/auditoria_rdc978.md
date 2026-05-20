@@ -39,7 +39,7 @@ Toda ação humana via interface web é capturada automaticamente pelo **Zope Hi
 - Ação executada (criação, edição, transição de workflow)
 - Estado anterior e novo (workflow)
 
-**Verificação:** Abrir AR â†’ aba *History* â†’ listagem cronológica com usuário e timestamp.
+**Verificação:** Abrir AR → aba *History* → listagem cronológica com usuário e timestamp.
 
 ### 3.2 Rastreabilidade de Resultados Automatizados (ASTM)
 
@@ -51,7 +51,7 @@ recebe um carimbo de auditoria no formato:
 Fonte: Mindray_BS200. AR: HGU-AR-001.
 ```
 
-**Verificação:** SENAITE â†’ Analysis â†’ campo *Remarks* (visível na UI ou via API).
+**Verificação:** SENAITE → Analysis → campo *Remarks* (visível na UI ou via API).
 Isso permite ao auditor identificar **qual equipamento** gerou o dado e **por qual via**
 ele chegou ao sistema.
 
@@ -107,7 +107,7 @@ docker logs middleware_instruments 2>&1 | grep "resultado_importado" | python -c
 docker logs -f middleware_instruments 2>&1 | grep --line-buffered "HGUMBA-Audit"
 ```
 
-### 3.4 Rastreabilidade de Pedidos (SANDRA â†’ SENAITE)
+### 3.4 Rastreabilidade de Pedidos (SANDRA → SENAITE)
 
 Quando um pedido chega via SANDRA, o middleware:
 
@@ -125,8 +125,8 @@ e o momento da criação.
 
 | Onde Olhar | O Que Encontrar | RDC 978/2025 |
 |-----------|----------------|--------------|
-| AR â†’ aba *History* | Quem criou, quando, transições de workflow | Art. 12 ” Rastreabilidade de Ações |
-| Analysis â†’ *Remarks* | Carimbo `[AUDITORIA] Fonte: {equipamento}` | Art. 13 ” Identificação da Origem |
+| AR → aba *History* | Quem criou, quando, transições de workflow | Art. 12 ” Rastreabilidade de Ações |
+| Analysis → *Remarks* | Carimbo `[AUDITORIA] Fonte: {equipamento}` | Art. 13 ” Identificação da Origem |
 | `docker logs middleware_instruments` | JSON com `audit_data` completo | Art. 14 ” Logs Estruturados |
 | `docker logs middleware_gateway` | JSON com `evento: pedido_injetado` | Art. 14 ” Logs Estruturados |
 | CDM PDF (`@@cdm-pdf`) | Usuário e data no rodapé do documento | Art. 15 ” Integridade do Documento |
@@ -141,7 +141,7 @@ Se o Daemon TCP não conseguir injetar o resultado no SENAITE (ex: AR não encon
 SENAITE offline), o evento `resultado_falha` é registrado no log JSON e o frame ASTM
 é rejeitado com NAK, fazendo o analisador reenviar.
 
-### 5.2 Falha no Webhook (SENAITE â†’ SANDRA)
+### 5.2 Falha no Webhook (SENAITE → SANDRA)
 
 Se o middleware não conseguir notificar o SANDRA sobre um laudo publicado,
 o evento `laudo_publicado` é registrado com `sandra_notificado: false` e o

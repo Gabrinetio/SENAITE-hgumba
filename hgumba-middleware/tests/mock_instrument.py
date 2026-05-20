@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Emulador ASTM E1381/E1394 — simula analisador Mindray BS200 para testes end-to-end.
 

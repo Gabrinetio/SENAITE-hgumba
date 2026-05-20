@@ -29,7 +29,7 @@
 |-----------------|------|
 | Subir o ambiente local | `04-middleware-readme.md` (instalação + compose) |
 | Configurar um analisador | `05-integracao.md` (seção 3: portas e handshake) |
-| Mapear exame CATSERV â†’ SENAITE | `05-integracao.md` (seção 1: dicionário) |
+| Mapear exame CATSERV → SENAITE | `05-integracao.md` (seção 1: dicionário) |
 | Fazer deploy no Swarm | `06-deploy.md` |
 | Criar um endpoint Zope novo | `02-customizations.md` (seções 1, 5, 6) |
 | Troubleshooting de resultado rejeitado | `05-integracao.md` (seção 7: audit logger) |

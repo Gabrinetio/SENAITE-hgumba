@@ -12,7 +12,7 @@
 3. [Solicitar Exames com Múltiplos Médicos (CoPhysicians)](#3-solicitar-exames-com-m-ltiplos-m-dicos-cophysicians)
 4. [Gerar o PDF do CDM (Faturamento)](#4-gerar-o-pdf-do-cdm-faturamento)
 5. [Interpretar Flags [ALTO] e [BAIXO] nos Laudos](#5-interpretar-flags-alto-e-baixo-nos-laudos)
-6. [Assinar e Publicar o Laudo (Publish â†’ SANDRA)](#6-assinar-e-publicar-o-laudo-publish-sandra)
+6. [Assinar e Publicar o Laudo (Publish → SANDRA)](#6-assinar-e-publicar-o-laudo-publish-sandra)
 7. [Verificar se o Laudo Chegou ao SANDRA](#7-verificar-se-o-laudo-chegou-ao-sandra)
 8. [Solução de Problemas Comuns](#8-solu-o-de-problemas-comuns)
 
@@ -32,9 +32,9 @@
 
 Após o login, você verá o painel principal do SENAITE com:
 
-- **Clients** â†’ Clique em "HGU" para acessar os pacientes e requisições do hospital
-- **Analysis Requests** â†’ Lista de todas as requisições de exames pendentes e concluídas
-- **Tasks** â†’ Suas tarefas pendentes (resultados para liberar)
+- **Clients** → Clique em "HGU" para acessar os pacientes e requisições do hospital
+- **Analysis Requests** → Lista de todas as requisições de exames pendentes e concluídas
+- **Tasks** → Suas tarefas pendentes (resultados para liberar)
 
 ---
 
@@ -42,7 +42,7 @@ Após o login, você verá o painel principal do SENAITE com:
 
 ### Passo a Passo
 
-1. No menu lateral, clique em **Clients** â†’ **HGU**
+1. No menu lateral, clique em **Clients** → **HGU**
 2. Clique na aba **Analysis Requests**
 3. Clique no botão **Add** (ou o ícone de "+" no canto superior direito)
 
@@ -114,30 +114,30 @@ O **Comprovante de Despesas Médicas (CDM)** é o documento que lista os exames 
 ### O Que Vem no PDF
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚        COMPROVANTE DE DESPESAS MÃ‰DICAS        â”‚
-â”‚                                              â”‚
-â”‚  Requisição: HGU-AR-042                      â”‚
-â”‚  Paciente: MARIA DA SILVA SANTOS             â”‚
-â”‚                                              â”‚
-â”‚  Profissionais Solicitantes:                 â”‚
-â”‚   - Dr. CARLOS ALMEIDA (principal)           â”‚
-â”‚   - Dr. ANA BEATRIZ PEREIRA (co-solicitante) â”‚
-â”‚                                              â”‚
-â”‚  Exame            Código     Valor           â”‚
-â”‚  â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€        â”‚
-â”‚  Glicemia         03.02.005  R$ 8,90         â”‚
-â”‚  Hemograma        01.01.001  R$ 12,50        â”‚
-â”‚  Colesterol Total 04.01.001  R$ 15,00        â”‚
-â”‚                              â”€â”€â”€â”€â”€â”€â”€â”€â”€        â”‚
-â”‚                     TOTAL:   R$ 36,40         â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────────────────────────────────────────┐
+│        COMPROVANTE DE DESPESAS MÃ‰DICAS        │
+│                                              │
+│  Requisição: HGU-AR-042                      │
+│  Paciente: MARIA DA SILVA SANTOS             │
+│                                              │
+│  Profissionais Solicitantes:                 │
+│   - Dr. CARLOS ALMEIDA (principal)           │
+│   - Dr. ANA BEATRIZ PEREIRA (co-solicitante) │
+│                                              │
+│  Exame            Código     Valor           │
+│  ─────────────────────────────────────        │
+│  Glicemia         03.02.005  R$ 8,90         │
+│  Hemograma        01.01.001  R$ 12,50        │
+│  Colesterol Total 04.01.001  R$ 15,00        │
+│                              ─────────        │
+│                     TOTAL:   R$ 36,40         │
+└──────────────────────────────────────────────┘
 ```
 
 ### Para Imprimir
 
 - Abra o PDF baixado
-- Clique em **Arquivo â†’ Imprimir** (ou `Ctrl + P`)
+- Clique em **Arquivo → Imprimir** (ou `Ctrl + P`)
 - Escolha a impressora do laboratório
 - O CDM impresso deve acompanhar a requisição física para o setor de faturamento
 
@@ -156,19 +156,19 @@ uma flag visível:
 ### Como Aparece no Laudo
 
 ```
-â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-â”‚              LAUDO DE EXAMES                  â”‚
-â”‚                                              â”‚
-â”‚  Paciente: MARIA DA SILVA SANTOS             â”‚
-â”‚  Requisição: HGU-AR-042                      â”‚
-â”‚                                              â”‚
-â”‚  Glicemia: 200.0 mg/dL  **[ALTO]**           â”‚
-â”‚  Hemoglobina: 8.0 g/dL  **[BAIXO]**          â”‚
-â”‚  Colesterol: 180.0 mg/dL                     â”‚
-â”‚                                              â”‚
-â”‚  â”€â”€ Gráfico de Histórico: Glicemia â”€â”€        â”‚
-â”‚  [gráfico mostrando evolução]                â”‚
-â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+┌──────────────────────────────────────────────┐
+│              LAUDO DE EXAMES                  │
+│                                              │
+│  Paciente: MARIA DA SILVA SANTOS             │
+│  Requisição: HGU-AR-042                      │
+│                                              │
+│  Glicemia: 200.0 mg/dL  **[ALTO]**           │
+│  Hemoglobina: 8.0 g/dL  **[BAIXO]**          │
+│  Colesterol: 180.0 mg/dL                     │
+│                                              │
+│  ── Gráfico de Histórico: Glicemia ──        │
+│  [gráfico mostrando evolução]                │
+└──────────────────────────────────────────────┘
 ```
 
 ### O Que Fazer
@@ -185,7 +185,7 @@ uma flag visível:
 
 ---
 
-## 6. Assinar e Publicar o Laudo (Publish â†’ SANDRA)
+## 6. Assinar e Publicar o Laudo (Publish → SANDRA)
 
 Após os resultados ficarem prontos, o laudo precisa ser **assinado eletronicamente**
 (publicado) para que:
@@ -196,21 +196,21 @@ Após os resultados ficarem prontos, o laudo precisa ser **assinado eletronicame
 
 ```
 Resultados digitados/importados
-        â”‚
-        â–¼
+        │
+        ▼
    Biomédico verifica resultados
    (confere flags [ALTO]/[BAIXO])
-        â”‚
-        â–¼
+        │
+        ▼
    Biomédico clica em "Publish" (Assinar)
-        â”‚
-        â–¼
+        │
+        ▼
    Laudo muda para estado "published"
-        â”‚
-        â–¼
+        │
+        ▼
    Sistema envia PDF para o SANDRA (automático)
-        â”‚
-        â–¼
+        │
+        ▼
    Médico acessa o laudo pelo prontuário no SANDRA
 ```
 
@@ -228,14 +228,14 @@ Resultados digitados/importados
 5. Confirme a ação na janela que aparece:
 
    ```
-   â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
-   â”‚  Publicar Análises                  â”‚
-   â”‚                                     â”‚
-   â”‚  Deseja publicar esta requisição?   â”‚
-   â”‚  O laudo será enviado ao SANDRA.    â”‚
-   â”‚                                     â”‚
-   â”‚  [Cancelar]  [Confirmar]            â”‚
-   â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+   ┌─────────────────────────────────────┐
+   │  Publicar Análises                  │
+   │                                     │
+   │  Deseja publicar esta requisição?   │
+   │  O laudo será enviado ao SANDRA.    │
+   │                                     │
+   │  [Cancelar]  [Confirmar]            │
+   └─────────────────────────────────────┘
    ```
 
 6. Após confirmar, o estado muda para **`published`**
@@ -250,7 +250,7 @@ Após publicar, você pode:
 
 - Ver o status na lista: o ícone da requisição muda para verde (publicado)
 - Clicar em **View PDF** para visualizar o laudo final
-- Na aba **History**, ver o registro: "Transition: publish â†’ published by usuario"
+- Na aba **History**, ver o registro: "Transition: publish → published by usuario"
 
 ---
 
