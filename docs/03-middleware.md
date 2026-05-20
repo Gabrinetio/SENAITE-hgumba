@@ -1,20 +1,20 @@
-> **Origem:** `SENAITE/hgumba-middleware/spec-middleware.md`
+﻿> **Origem:** `SENAITE/hgumba-middleware/spec-middleware.md`
 
-# Middleware H Gu Marabá — Spec-first
+# Middleware HGUMBA â€” Spec-first
 
-## Visão Geral
+## VisÃ£o Geral
 
-API Gateway que orquestra a integração entre o SENAITE LIS (Laboratório) e os sistemas do Exército Brasileiro (SANDRA, SIRE, CADBEN).
+API Gateway que orquestra a integraÃ§Ã£o entre o SENAITE LIS (LaboratÃ³rio) e os sistemas do ExÃ©rcito Brasileiro (SANDRA, SIRE, CADBEN).
 
 **Stack:** Python 3.12+ / FastAPI / Pydantic / httpx / uvicorn
 
-**Função:** Blindar o SENAITE de mudanças externas, validar dados na entrada, e traduzir contratos entre os sistemas.
+**FunÃ§Ã£o:** Blindar o SENAITE de mudanÃ§as externas, validar dados na entrada, e traduzir contratos entre os sistemas.
 
 ---
 
 ## Rotas
 
-### 1. SANDRA → Middleware (Ingestão de Pedidos)
+### 1. SANDRA â†’ Middleware (IngestÃ£o de Pedidos)
 
 ```http
 POST /api/v1/sandra/ingestao
@@ -24,7 +24,7 @@ Accept: application/json
 {
   "id_pedido": "PED-2026-0001",
   "cpf_paciente": "12345678901",
-  "nome_paciente": "JOÃO SILVA",
+  "nome_paciente": "JOÃƒO SILVA",
   "medico_solicitante": "Dr. Carlos Almeida",
   "crm_solicitante": "12345-AM",
   "data_solicitacao": "2026-05-18T10:30:00Z",
@@ -46,11 +46,11 @@ Accept: application/json
 
 **Fluxo interno (BackgroundTasks):**
 1. Validar elegibilidade no CADBEN
-2. Validar autorização no SIRE
-3. Mapear `codigo_catserv` → UID AnalysisService (via tabela CATSERV no PostgreSQL)
+2. Validar autorizaÃ§Ã£o no SIRE
+3. Mapear `codigo_catserv` â†’ UID AnalysisService (via tabela CATSERV no PostgreSQL)
 4. Criar AnalysisRequest no SENAITE via `@@hgumba-create-ar` (bypass do `@@API/create` que bloqueia AR)
 
-### 2. SENAITE → Middleware (Webhook Laudo Publicado)
+### 2. SENAITE â†’ Middleware (Webhook Laudo Publicado)
 
 ```http
 POST /api/v1/senaite/webhook/laudo_publicado
@@ -59,11 +59,11 @@ Content-Type: application/json
 {
   "analysis_request_id": "HGU-AR-001",
   "client_id": "hgu",
-  "patient_name": "JOÃO SILVA",
+  "patient_name": "JOÃƒO SILVA",
   "pdf_url": "http://senaite:8080/clients/hgu/HGU-AR-001/@@cdm-pdf",
   "review_state": "published",
   "results": [
-    {"analysis": "Hemograma", "result": "5.2", "unit": "milhões/mm³", "status": "published"}
+    {"analysis": "Hemograma", "result": "5.2", "unit": "milhÃµes/mmÂ³", "status": "published"}
   ]
 }
 ```
@@ -103,53 +103,53 @@ GET /health
 
 ### `sandra.py`
 
-| Modelo | Campo | Tipo | Validação |
+| Modelo | Campo | Tipo | ValidaÃ§Ã£o |
 |--------|-------|------|-----------|
-| `ExameSolicitado` | `codigo_catserv` | `str` | Obrigatório |
-| | `descricao` | `str` | — |
+| `ExameSolicitado` | `codigo_catserv` | `str` | ObrigatÃ³rio |
+| | `descricao` | `str` | â€” |
 | | `urgente` | `bool` | Default `false` |
-| `OrdemServicoSANDRA` | `id_pedido` | `str` | Obrigatório |
+| `OrdemServicoSANDRA` | `id_pedido` | `str` | ObrigatÃ³rio |
 | | `cpf_paciente` | `str` | `pattern=r"^\d{11}$"` |
-| | `nome_paciente` | `str` | — |
-| | `medico_solicitante` | `str` | — |
-| | `crm_solicitante` | `str` | — |
+| | `nome_paciente` | `str` | â€” |
+| | `medico_solicitante` | `str` | â€” |
+| | `crm_solicitante` | `str` | â€” |
 | | `data_solicitacao` | `datetime` | ISO 8601 |
-| | `exames` | `List[ExameSolicitado]` | Mínimo 1 |
-| `ResultadoExameSANDRA` | `id_pedido` | `str` | — |
-| | `cpf_paciente` | `str` | — |
-| | `analysis_request_id` | `str` | — |
+| | `exames` | `List[ExameSolicitado]` | MÃ­nimo 1 |
+| `ResultadoExameSANDRA` | `id_pedido` | `str` | â€” |
+| | `cpf_paciente` | `str` | â€” |
+| | `analysis_request_id` | `str` | â€” |
 | | `pdf_laudo_base64` | `str` | Base64 |
-| | `data_publicacao` | `datetime` | — |
-| | `observacoes` | `Optional[str]` | — |
+| | `data_publicacao` | `datetime` | â€” |
+| | `observacoes` | `Optional[str]` | â€” |
 
 ### `cadben.py`
 
-| Modelo | Campo | Tipo | Validação |
+| Modelo | Campo | Tipo | ValidaÃ§Ã£o |
 |--------|-------|------|-----------|
 | `BeneficiarioCADBEN` | `cpf` | `str` | `pattern=r"^\d{11}$"` |
-| | `nome` | `str` | — |
-| | `posto_graduacao` | `Optional[str]` | — |
-| | `organizacao_militar` | `Optional[str]` | — |
+| | `nome` | `str` | â€” |
+| | `posto_graduacao` | `Optional[str]` | â€” |
+| | `organizacao_militar` | `Optional[str]` | â€” |
 | | `ativo` | `bool` | Default `true` |
-| | `data_nascimento` | `Optional[date]` | — |
-| `ElegibilidadeResponse` | `cpf` | `str` | — |
-| | `elegivel` | `bool` | — |
-| | `motivo` | `Optional[str]` | — |
-| | `beneficiario` | `Optional[BeneficiarioCADBEN]` | — |
+| | `data_nascimento` | `Optional[date]` | â€” |
+| `ElegibilidadeResponse` | `cpf` | `str` | â€” |
+| | `elegivel` | `bool` | â€” |
+| | `motivo` | `Optional[str]` | â€” |
+| | `beneficiario` | `Optional[BeneficiarioCADBEN]` | â€” |
 
 ### `senaite.py`
 
-| Modelo | Campo | Tipo | Descrição |
+| Modelo | Campo | Tipo | DescriÃ§Ã£o |
 |--------|-------|------|-----------|
 | `AnalysisRequestPayload` | `client_id` | `str` | Default `"hgu"` |
-| | `contact_uid` | `Optional[str]` | UID do médico solicitante |
+| | `contact_uid` | `Optional[str]` | UID do mÃ©dico solicitante |
 | | `patient_uid` | `Optional[str]` | UID do paciente |
-| | `services` | `List[str]` | Lista de UIDs/códigos CATSERV |
-| | `title` | `Optional[str]` | — |
+| | `services` | `List[str]` | Lista de UIDs/cÃ³digos CATSERV |
+| | `title` | `Optional[str]` | â€” |
 | `WebhookLaudoPayload` | `analysis_request_id` | `str` | ID da AR publicada |
-| | `client_id` | `str` | — |
-| | `patient_name` | `Optional[str]` | — |
-| | `pdf_url` | `Optional[str]` | — |
+| | `client_id` | `str` | â€” |
+| | `patient_name` | `Optional[str]` | â€” |
+| | `pdf_url` | `Optional[str]` | â€” |
 | | `review_state` | `str` | Estado do workflow |
 | | `results` | `Optional[List[dict]]` | Resultados dos exames |
 
@@ -158,45 +158,45 @@ GET /health
 ## Arquitetura
 
 ```
-┌──────────┐     POST /api/v1/sandra/ingestao     ┌──────────────────┐
-│  SANDRA  │ ──────────────────────────────────►   │                  │
-│ (Pront.) │                                       │   MIDDLEWARE     │
-└──────────┘                                       │   FastAPI        │
-                                                    │   8000           │
-┌──────────┐     POST /api/v1/senaite/...          │                  │
-│ SENAITE  │ ◄──────────────────────────────────   │  ┌─ ingestao.py  │
-│ (LIS)    │                                       │  ├─ webhooks.py  │
-└──────────┘                                       │  ├─ senaite_api  │
-                                                    │  └─ exercito_api │
-┌──────────┐                                       └────────┬─────────┘
-│ CADBEN   │ ◄─────── GET /api/v1/beneficiarios            │
-│ (Elegib.)│                                                │
-└──────────┘                                     ┌──────────▼─────────┐
-                                                   │  PostgreSQL        │
-┌──────────┐                                      │  (CATSERV billing) │
-│  SIRE    │ ◄─────── GET /api/v1/guias           └────────────────────┘
-│ (Verba)  │
-└──────────┘
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     POST /api/v1/sandra/ingestao     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+â”‚  SANDRA  â”‚ â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–º   â”‚                  â”‚
+â”‚ (Pront.) â”‚                                       â”‚   MIDDLEWARE     â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                       â”‚   FastAPI        â”‚
+                                                    â”‚   8000           â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”     POST /api/v1/senaite/...          â”‚                  â”‚
+â”‚ SENAITE  â”‚ â—„â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€   â”‚  â”Œâ”€ ingestao.py  â”‚
+â”‚ (LIS)    â”‚                                       â”‚  â”œâ”€ webhooks.py  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                       â”‚  â”œâ”€ senaite_api  â”‚
+                                                    â”‚  â””â”€ exercito_api â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                                       â””â”€â”€â”€â”€â”€â”€â”€â”€â”¬â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”‚ CADBEN   â”‚ â—„â”€â”€â”€â”€â”€â”€â”€ GET /api/v1/beneficiarios            â”‚
+â”‚ (Elegib.)â”‚                                                â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜                                     â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â–¼â”€â”€â”€â”€â”€â”€â”€â”€â”€â”
+                                                   â”‚  PostgreSQL        â”‚
+â”Œâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”                                      â”‚  (CATSERV billing) â”‚
+â”‚  SIRE    â”‚ â—„â”€â”€â”€â”€â”€â”€â”€ GET /api/v1/guias           â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
+â”‚ (Verba)  â”‚
+â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
 ### Camadas
 
-| Camada | Módulo | Responsabilidade |
+| Camada | MÃ³dulo | Responsabilidade |
 |--------|--------|------------------|
 | **Router** | `routers/ingestao.py` | Endpoints de entrada (SANDRA) |
-| | `routers/webhooks.py` | Webhooks de saída (SENAITE) |
+| | `routers/webhooks.py` | Webhooks de saÃ­da (SENAITE) |
 | **Client** | `clients/senaite_api.py` | httpx AsyncClient para JSON API do SENAITE |
 | | `clients/exercito_api.py` | httpx AsyncClient para CADBEN/SIRE/SANDRA |
-| **Model** | `models/sandra.py` | Schemas Pydantic — contratos SANDRA |
-| | `models/cadben.py` | Schemas Pydantic — contratos CADBEN |
-| | `models/senaite.py` | Schemas Pydantic — contratos SENAITE |
-| **Config** | `config.py` | `BaseSettings` via variáveis de ambiente /.env |
+| **Model** | `models/sandra.py` | Schemas Pydantic â€” contratos SANDRA |
+| | `models/cadben.py` | Schemas Pydantic â€” contratos CADBEN |
+| | `models/senaite.py` | Schemas Pydantic â€” contratos SENAITE |
+| **Config** | `config.py` | `BaseSettings` via variÃ¡veis de ambiente /.env |
 
 ---
 
-## Configuração
+## ConfiguraÃ§Ã£o
 
-Variáveis de ambiente (`.env`):
+VariÃ¡veis de ambiente (`.env`):
 
 ```
 SENAITE_URL=http://localhost:8083/senaite
@@ -217,13 +217,13 @@ LOG_LEVEL=info
 
 ---
 
-## Execução
+## ExecuÃ§Ã£o
 
 ```bash
 # Desenvolvimento (hot-reload)
 uv run uvicorn src.main:app --reload --port 8000
 
-# Produção
+# ProduÃ§Ã£o
 uv run uvicorn src.main:app --host 0.0.0.0 --port 8000
 
 # Teste de health
@@ -232,12 +232,12 @@ curl http://localhost:8000/health
 
 ---
 
-## Próximos Passos
+## PrÃ³ximos Passos
 
-1. **Mapeamento CATSERV**: Integrar tabela `tabela_catserv` do PostgreSQL para converter `codigo_catserv` → UID/ID do AnalysisService no SENAITE.
+1. **Mapeamento CATSERV**: Integrar tabela `tabela_catserv` do PostgreSQL para converter `codigo_catserv` â†’ UID/ID do AnalysisService no SENAITE.
 2. **Configurar Webhook no SENAITE**: Registrar o webhook `POST /api/v1/senaite/webhook/laudo_publicado` no Zope Management Interface (via `@@webhooks-controlpanel` ou ZCML).
 3. **Dockerizar**: `compose.middleware.yaml` com o middleware ao lado do SENAITE.
-4. **Autenticação SANDRA**: Quando API real for fornecida, substituir mocks por autenticação real.
+4. **AutenticaÃ§Ã£o SANDRA**: Quando API real for fornecida, substituir mocks por autenticaÃ§Ã£o real.
 
 ---
 
