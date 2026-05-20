@@ -36,11 +36,12 @@ def notify_middleware_on_publish(obj, event):
     webhook_url = "http://middleware_gateway:8000/api/v1/senaite/webhook/laudo_publicado"
 
     patient_name = ""
-    if hasattr(obj, "getPatientFullName"):
-        try:
-            patient_name = obj.getPatientFullName()
-        except Exception:
-            pass
+    try:
+        patient = obj.getPatient()
+        if patient is not None:
+            patient_name = patient.Title()
+    except Exception:
+        pass
 
     payload = {
         "analysis_request_id": obj.getId(),

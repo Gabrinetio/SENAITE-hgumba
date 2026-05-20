@@ -99,14 +99,14 @@ class SenaiteClient:
         search = await self._get("/@@API/senaite/v1/search", params={
             "portal_type": "Analysis",
             "getKeyword": service_keyword,
-            "parent_path": f"/senaite/clients/{client_id}/{analysis_request_id}",
+            "path": f"/senaite/clients/{client_id}/{analysis_request_id}",
         })
         items = search.get("items", [])
         if not items:
             logger.warning("Analysis não encontrada: AR=%s keyword=%s", analysis_request_id, service_keyword)
             return {"success": False, "message": "Analysis not found"}
         uid = items[0].get("uid")
-        result = await self._post("/@@API/senaite/v1/update", params={
+        result = await self._post("/@@API/senaite/v1/update", data={
             "uid": uid,
             "Result": str(result_value),
         })

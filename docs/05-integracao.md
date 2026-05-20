@@ -549,7 +549,7 @@ Quando as variÃ¡veis de ambiente `SANDRA_BASE_URL`, `CADBEN_BASE_URL` e `SIRE_
 
 | API | Resposta Mock |
 |-----|--------------|
-| CADBEN | `{"cpf": "...", "elegivel": true, "beneficiario": {"nome": "Paciente DEV", "posto_graduacao": "Sd DEV", "organizacao_militar": "HGUMBA "ativo": true}}` |
+| CADBEN | `{"cpf": "...", "elegivel": true, "beneficiario": {"nome": "Paciente DEV", "posto_graduacao": "Sd DEV", "organizacao_militar": "HGUMBA", "ativo": true}}` |
 | SIRE | `True` (sempre autorizada) |
 | SANDRA | `True` (sempre notificado com sucesso) |
 

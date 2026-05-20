@@ -61,7 +61,8 @@ class CreateAnalysisRequestView(BrowserView):
     def __call__(self):
         self.request.response.setHeader('Content-Type', 'application/json')
         try:
-            raw = self.request.get('BODY', '{}')
+            self.request.stdin.seek(0)
+            raw = self.request.stdin.read() or '{}'
             data = json.loads(raw)
         except Exception:
             self.request.response.setStatus(400)
@@ -175,7 +176,8 @@ class SetRemarkView(BrowserView):
     def __call__(self):
         self.request.response.setHeader('Content-Type', 'application/json')
         try:
-            raw = self.request.get('BODY', '{}')
+            self.request.stdin.seek(0)
+            raw = self.request.stdin.read() or '{}'
             data = json.loads(raw)
         except Exception:
             self.request.response.setStatus(400)

@@ -22,8 +22,8 @@ logger = logging.getLogger("hgumba-gateway")
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 app = FastAPI(
-    title="Middleware HGUMBA
-    description="API Gateway entre SENAITE LIS e Sistemas do ExÃ©rcito (SANDRA, SIRE, CADBEN)",
+    title="Middleware HGUMBA",
+    description="API Gateway entre SENAITE LIS e Sistemas do Exército (SANDRA, SIRE, CADBEN)",
     version="1.0.0",
     on_startup=[lambda: audit_logger.info("Gateway iniciado", extra={
         "audit_data": {"evento": "gateway_iniciado", "versao": "1.0.0"}
