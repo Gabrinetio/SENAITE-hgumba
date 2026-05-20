@@ -1,0 +1,91 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: senaite-hgumba:local
+    ports:
+      - "8083:8080"
+    volumes:
+      - senaite_data:/data
+      - ./customizations/src/senaite.hgumba/src:/opt/senaite/addons/src
+    environment:
+      DB_HOST: db
+      DB_PORT: "5432"
+      DB_NAME: financeiro
+      DB_USER: catserv
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    networks:
+      - senaite_net
+
+  db:
+    image: postgres:13-alpine
+    environment:
+      POSTGRES_DB: ${DB_NAME:-financeiro}
+      POSTGRES_USER: ${DB_USER:-catserv}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    ports:
+      - "5433:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    networks:
+      - senaite_net
+
+  middleware_gateway:
+    build:
+      context: ./hgumba-middleware
+      dockerfile: Dockerfile
+    image: hgumba-middleware:local
+    command: uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./hgumba-middleware/src:/app/src
+      - ./hgumba-middleware/pyproject.toml:/app/pyproject.toml
+    environment:
+      SENAITE_URL: "http://app:8080/senaite"
+      SENAITE_USER: admin
+      SENAITE_PASSWORD: ${SENAITE_PASSWORD:-admin}
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: "${DB_PORT:-5432}"
+      DB_NAME: ${DB_NAME:-financeiro}
+      DB_USER: ${DB_USER:-catserv}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+    depends_on:
+      - app
+      - db
+    networks:
+      - senaite_net
+
+  middleware_instruments:
+    build:
+      context: ./hgumba-middleware
+      dockerfile: Dockerfile
+    image: hgumba-middleware:local
+    command: uv run instrumentos --portas=5001,5002,5003,5004,5005
+    ports:
+      - "5001:5001"
+      - "5002:5002"
+      - "5003:5003"
+      - "5004:5004"
+      - "5005:5005"
+    volumes:
+      - ./hgumba-middleware/src:/app/src
+      - ./hgumba-middleware/pyproject.toml:/app/pyproject.toml
+    environment:
+      SENAITE_URL: "http://app:8080/senaite"
+      SENAITE_USER: ${SENAITE_USER:-admin}
+      SENAITE_PASSWORD: ${SENAITE_PASSWORD:-admin}
+    depends_on:
+      - app
+    networks:
+      - senaite_net
+
+volumes:
+  senaite_data:
+  pg_data:
+
+networks:
+  senaite_net:
+    driver: bridge

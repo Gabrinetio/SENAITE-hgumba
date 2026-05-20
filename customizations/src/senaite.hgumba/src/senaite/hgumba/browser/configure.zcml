@@ -1,0 +1,47 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    i18n_domain="senaite.hgumba">
+
+    <include package=".views" />
+
+    <browser:page
+        name="cdm-pdf"
+        for="*"
+        class=".views.cdm_view.CDMView"
+        permission="zope2.View" />
+
+    <browser:page
+        name="hgumba-report-pdf"
+        for="*"
+        class=".views.report_view.ReportWithHistoryView"
+        permission="zope2.View" />
+
+    <browser:page
+        name="hgumba-seed"
+        for="*"
+        class=".views.seed.SeedView"
+        permission="senaite.hgumba: Manage Analysis Requests" />
+
+    <browser:page
+        name="hgumba-debug"
+        for="*"
+        class=".views.debugview.DebugView"
+        permission="cmf.ManagePortal" />
+
+    <browser:page
+        name="hgumba-create-ar"
+        for="*"
+        class=".views.create_ar.CreateAnalysisRequestView"
+        permission="senaite.hgumba: Manage Analysis Requests" />
+
+    <browser:page
+        name="hgumba-set-remark"
+        for="*"
+        class=".views.create_ar.SetRemarkView"
+        permission="senaite.hgumba: Manage Analysis Requests" />
+
+</configure>
+
+
+

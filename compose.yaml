@@ -1,0 +1,33 @@
+version: "3.8"
+
+services:
+  app:
+    image: ${REGISTRY:-ghcr.io}/senaite:2.x
+    entrypoint: ["/bin/bash", "/opt/senaite/addons/startup.sh"]
+    ports:
+      - "8083:8080"
+    volumes:
+      - /opt/senaite/var:/opt/senaite/var
+      - /opt/senaite/addons/src:/opt/senaite/addons/src:ro
+      - /opt/senaite/addons/senaite-hgumba.pth:/usr/local/lib/python2.7/site-packages/senaite-hgumba.pth:ro
+      - /opt/senaite/addons/package-includes:/home/senaite/senaitelims/parts/instance/etc/package-includes
+      - /opt/senaite/addons/startup.sh:/opt/senaite/addons/startup.sh:ro
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 2G
+        reservations:
+          cpus: "0.5"
+          memory: 1G
+    networks:
+      - proxy_network
+
+networks:
+  proxy_network:
+    external: true

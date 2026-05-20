@@ -1,0 +1,134 @@
+# ─────────────────────────────────────────────────────────────
+#  SENAITE LIS + Middleware — GitIgnore Definitivo
+#  Customizações Zope/Plone (Python 2.7) + FastAPI (Python 3.12)
+# ─────────────────────────────────────────────────────────────
+
+
+# ─── ZODB / Banco de Dados SENAITE ──────────────────────────
+# Data.fs e índices (bind mount em /opt/senaite/var)
+*.fs
+*.fs.index
+*.fs.tmp
+*.fs.old
+
+# repozo — backup e restore do ZODB
+*.zrep
+*.zlog
+*.zct
+*.zbl
+
+
+# ─── PostgreSQL / CATSERV ────────────────────────────────────
+# Volume nomeado pg_data do docker-compose
+pg_data/
+
+# Dumps SQL
+*.dump
+*.sql.gz
+*.pgdump
+*.backup
+
+
+# ─── Python / uv ─────────────────────────────────────────────
+# Virtual environment (uv)
+.venv/
+.venv.bak/
+
+# Bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Egg info (setuptools build)
+*.egg-info/
+*.egg
+
+# Wheel / dist builds
+dist/
+build/
+*.whl
+*.tar.gz
+
+# Pytest cache
+.pytest_cache/
+
+# Mypy / type checker cache
+.mypy_cache/
+.pytype/
+
+
+# ─── Logs ────────────────────────────────────────────────────
+# Audit trail (JSONRotatingFileHandler — audit.log)
+audit.log
+*.audit.log
+
+# Logs genéricos
+*.log
+*.log.*
+
+
+# ─── Ambiente / Config local ─────────────────────────────────
+# .env é o arquivo real (NUNCA versionar)
+.env
+.env.*.local
+.env.local
+.env.production
+.env.development
+
+# .env.example é VERSIONADO (template sem secrets)
+!.env.example
+
+
+# ─── Docker (locais) ─────────────────────────────────────────
+# Volumes nomeados persistentes
+senaite_data/
+pg_data/
+
+# Docker Compose override (dev local)
+docker-compose.override.yml
+compose.override.yaml
+
+
+# ─── IDE / Editor ────────────────────────────────────────────
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains
+.idea/
+*.iml
+
+# Vim / NeoVim
+*.swp
+*.swo
+*~
+*.un~
+
+# Windows
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+
+
+# ─── OS artifacts ────────────────────────────────────────────
+# Temp files
+*.tmp
+*.temp
+~$*
+
+
+# ─── Projetos e IDEs específicos deste repo ──────────────────
+# Dados de mock/pipeline que são gerados em runtime
+*.csv
+*.parquet
+
+# cache do OpenCode/Codex
+.opencode/
+.claude/

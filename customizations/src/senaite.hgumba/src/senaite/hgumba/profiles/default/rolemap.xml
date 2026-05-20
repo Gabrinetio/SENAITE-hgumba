@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<rolemap>
+  <permissions>
+    <permission name="senaite.hgumba: Manage Analysis Requests" acquire="True">
+      <role name="Manager"/>
+      <role name="LabManager"/>
+      <role name="LabClerk"/>
+    </permission>
+  </permissions>
+</rolemap>

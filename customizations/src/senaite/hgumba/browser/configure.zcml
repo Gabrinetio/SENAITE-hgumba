@@ -1,0 +1,17 @@
+<configure xmlns="http://namespaces.zope.org/browser">
+
+    <browser:page
+        name="cdm-pdf"
+        for="senaite.core.content.analysisrequest.AnalysisRequest"
+        class=".views.cdm_view.CDMView"
+        permission="senaite.core.permissions.ManageAnalysisRequests"
+        layer="senaite.core.interfaces.ISenaiteCoreLayer" />
+
+    <browser:page
+        name="hgumba-report-pdf"
+        for="senaite.core.content.analysisrequest.AnalysisRequest"
+        class=".views.report_view.ReportWithHistoryView"
+        permission="senaite.core.permissions.ManageAnalysisRequests"
+        layer="senaite.core.interfaces.ISenaiteCoreLayer" />
+
+</configure>
