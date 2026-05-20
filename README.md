@@ -1,4 +1,4 @@
-# SENAITE LIS — H Gu Marabá
+# SENAITE LIS — HGUMBA
 
 Middleware de integração entre o **SENAITE LIMS** (Zope/Plone), **5 analisadores clínicos** (ASTM E1381/E1394, HL7 v2.x, RS-232) e os sistemas do **Exército Brasileiro** (SANDRA, SIRE, CADBEN).
 
