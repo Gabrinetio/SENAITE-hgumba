@@ -216,4 +216,4 @@ SENAITE/
 
 ---
 
-**Licença:** Uso interno — Hospital Gu Marabá / Exército Brasileiro
+**Licença:** Uso interno — HGUMBA / Exército Brasileiro
