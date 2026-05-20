@@ -1,4 +1,4 @@
-﻿import logging
+import logging
 
 import uvicorn
 from fastapi import FastAPI, Request

@@ -1,6 +1,6 @@
-﻿# HGUMBA Middleware
+# HGUMBA Middleware
 
-API Gateway que orquestra a integraÃ§Ã£o entre o **SENAITE LIS**, os **5 analisadores clÃ­nicos** e os sistemas do **ExÃ©rcito Brasileiro** (SANDRA, SIRE, CADBEN).
+API Gateway que orquestra a integração entre o **SENAITE LIS**, os **5 analisadores clínicos** e os sistemas do **Exército Brasileiro** (SANDRA, SIRE, CADBEN).
 
 Stack: **Python 3.12+ / FastAPI / httpx / Pydantic / uv**
 
@@ -43,7 +43,7 @@ Stack: **Python 3.12+ / FastAPI / httpx / Pydantic / uv**
 â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜     â””â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”˜
 ```
 
-### Duas AplicaÃ§Ãµes
+### Duas Aplicações
 
 | Processo | Entry Point | Responsabilidade | Portas |
 |----------|-------------|------------------|--------|
@@ -52,29 +52,29 @@ Stack: **Python 3.12+ / FastAPI / httpx / Pydantic / uv**
 
 ### Camadas Internas
 
-| Camada | MÃ³dulo | FunÃ§Ã£o |
+| Camada | Módulo | Função |
 |--------|--------|--------|
 | Router | `routers/ingestao.py` | Endpoints SANDRA â†’ SENAITE |
 | Router | `routers/webhooks.py` | Webhooks SENAITE â†’ SANDRA |
 | Client | `clients/senaite_api.py` | HTTP async para API do SENAITE |
 | Client | `clients/exercito_api.py` | HTTP async para SANDRA/CADBEN/SIRE (mocks) |
 | Model | `models/sandra.py`, `models/cadben.py`, `models/senaite.py` | Schemas Pydantic |
-| Instrument | `instruments/listener.py` | Servidor TCP assÃ­ncrono ASTM E1381/E1394 |
+| Instrument | `instruments/listener.py` | Servidor TCP assíncrono ASTM E1381/E1394 |
 | Instrument | `instruments/protocols/astm.py` | Parser ASTM com checksum, H/P/O/R/C/L |
 
 ---
 
-## PrÃ©-requisitos
+## Pré-requisitos
 
 - Python 3.12+
-- [uv](https://docs.astral.sh/uv/) (gerenciador de dependÃªncias)
+- [uv](https://docs.astral.sh/uv/) (gerenciador de dependências)
 
-### InstalaÃ§Ã£o
+### Instalação
 
 ```bash
 cd hgumba-middleware
-uv sync                     # instala dependÃªncias (runtime + dev)
-cp .env.example .env        # ajustar variÃ¡veis se necessÃ¡rio
+uv sync                     # instala dependências (runtime + dev)
+cp .env.example .env        # ajustar variáveis se necessário
 ```
 
 ---
@@ -88,13 +88,13 @@ cp .env.example .env        # ajustar variÃ¡veis se necessÃ¡rio
 uv run uvicorn main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-### Daemon de Instrumentos (MÃºltiplas Portas)
+### Daemon de Instrumentos (Múltiplas Portas)
 
 ```bash
 # Escuta todas as 5 portas (5001-5005)
 uv run instrumentos --portas=5001,5002,5003,5004,5005
 
-# Porta especÃ­fica
+# Porta específica
 uv run instrumentos --portas=5001
 ```
 
@@ -103,7 +103,7 @@ uv run instrumentos --portas=5001
 O middleware roda ao lado do SENAITE e do PostgreSQL:
 
 ```yaml
-# compose.local.yaml (diretÃ³rio pai)
+# compose.local.yaml (diretório pai)
 services:
   app                    # SENAITE LIS (porta 8083)
   db                     # PostgreSQL CATSERV (porta 5433)
@@ -133,35 +133,35 @@ docker compose -f ../compose.local.yaml logs -f middleware_instruments
 uv run pytest -v
 ```
 
-### Por mÃ³dulo
+### Por módulo
 
 ```bash
-uv run pytest -v tests/test_astm_parser.py   # 25 testes â€” parser ASTM
-uv run pytest -v tests/test_api.py           # 9 testes â€” endpoints da API
-uv run pytest -v tests/test_pipeline.py      # 5 testes â€” integraÃ§Ã£o ponta a ponta
+uv run pytest -v tests/test_astm_parser.py   # 25 testes ” parser ASTM
+uv run pytest -v tests/test_api.py           # 9 testes ” endpoints da API
+uv run pytest -v tests/test_pipeline.py      # 5 testes ” integração ponta a ponta
 ```
 
 ### Por filtro
 
 ```bash
 uv run pytest -k "astm"       # apenas parser
-uv run pytest -k "pipeline"   # apenas integraÃ§Ã£o
+uv run pytest -k "pipeline"   # apenas integração
 uv run pytest -k "api"        # apenas API
 ```
 
 ### Emulador de Instrumento ASTM
 
-Para testar a comunicaÃ§Ã£o com uma mÃ¡quina fÃ­sica localmente, utilize o emulador:
+Para testar a comunicação com uma máquina física localmente, utilize o emulador:
 
 ```bash
-# Terminal 1 â€” Iniciar o daemon em uma porta
+# Terminal 1 ” Iniciar o daemon em uma porta
 uv run instrumentos --portas=5001
 
-# Terminal 2 â€” Simular analisador enviando 3 amostras
+# Terminal 2 ” Simular analisador enviando 3 amostras
 uv run python tests/mock_instrument.py --port 5001 --machine Mindray_BS200
 ```
 
-O emulador envia 3 frames ASTM completos (com handshake ENQ/ACK/EOT) e o daemon responde com ACK a cada frame vÃ¡lido, parseia os registros e tenta enviar os resultados para o SENAITE via API v1.
+O emulador envia 3 frames ASTM completos (com handshake ENQ/ACK/EOT) e o daemon responde com ACK a cada frame válido, parseia os registros e tenta enviar os resultados para o SENAITE via API v1.
 
 ```bash
 # Personalizar amostras
@@ -182,7 +182,7 @@ curl http://localhost:8000/health
 
 ### Gateway (porta 8000)
 
-| MÃ©todo | Rota | DescriÃ§Ã£o |
+| Método | Rota | Descrição |
 |--------|------|-----------|
 | `GET` | `/health` | Health check |
 | `POST` | `/api/v1/sandra/ingestao` | Recebe pedido de exames do SANDRA |
@@ -192,14 +192,14 @@ Docs interativos: `http://localhost:8000/docs`
 
 ### SENAITE Add-on (porta 8083)
 
-| MÃ©todo | Rota | DescriÃ§Ã£o |
+| Método | Rota | Descrição |
 |--------|------|-----------|
 | `GET` | `@@hgumba-seed` | Cria dados de teste (Client + Services + ARs) |
 | `GET` | `@@cdm-pdf` | PDF do CDM (billing) |
-| `GET` | `@@hgumba-report-pdf` | Laudo com grÃ¡fico de histÃ³rico |
+| `GET` | `@@hgumba-report-pdf` | Laudo com gráfico de histórico |
 | `POST` | `@@hgumba-create-ar` | **Cria AR (bypass do @@API/create bloqueado)** |
-| `POST` | `@@hgumba-set-remark` | **Define Remarks em AR existente (bypass validaÃ§Ã£o @@API/update)** |
-| `GET` | `@@hgumba-debug` | Debug/introspecÃ§Ã£o |
+| `POST` | `@@hgumba-set-remark` | **Define Remarks em AR existente (bypass validação @@API/update)** |
+| `GET` | `@@hgumba-debug` | Debug/introspecção |
 
 ---
 
@@ -207,10 +207,10 @@ Docs interativos: `http://localhost:8000/docs`
 
 | # | Equipamento | Porta | Exames |
 |---|-------------|-------|--------|
-| 1 | Mindray BS-200 | 5001 | BioquÃ­mica (glicose, colesterol, etc.) |
+| 1 | Mindray BS-200 | 5001 | Bioquímica (glicose, colesterol, etc.) |
 | 2 | Sysmex XN-550 | 5002 | Hematologia (hemograma) |
-| 3 | Roche Cobas e411 | 5003 | ImunoquÃ­mica (hormÃ´nios, marcadores) |
-| 4 | Roche Cobas c311 | 5004 | QuÃ­mica ClÃ­nica |
+| 3 | Roche Cobas e411 | 5003 | Imunoquímica (hormônios, marcadores) |
+| 4 | Roche Cobas c311 | 5004 | Química Clínica |
 | 5 | Bio-Rad D-10 | 5005 | HbA1c |
 
 Protocolo: ASTM E1381 (enquadramento) + E1394 (registros H/P/O/R/C/L) sobre TCP/IP.
@@ -223,7 +223,7 @@ Protocolo: ASTM E1381 (enquadramento) + E1394 (registros H/P/O/R/C/L) sobre TCP/
 hgumba-middleware/
 â”œâ”€â”€ src/
 â”‚   â”œâ”€â”€ main.py                  # FastAPI app, entrada do gateway
-â”‚   â”œâ”€â”€ config.py                # Settings via .env / variÃ¡veis de ambiente
+â”‚   â”œâ”€â”€ config.py                # Settings via .env / variáveis de ambiente
 â”‚   â”œâ”€â”€ clients/
 â”‚   â”‚   â”œâ”€â”€ senaite_api.py       # httpx AsyncClient para API SENAITE
 â”‚   â”‚   â””â”€â”€ exercito_api.py      # httpx AsyncClient para SANDRA/CADBEN/SIRE
@@ -244,47 +244,47 @@ hgumba-middleware/
 â”œâ”€â”€ tests/
 â”‚   â”œâ”€â”€ test_astm_parser.py      # 25 testes do parser ASTM
 â”‚   â”œâ”€â”€ test_api.py              # 9 testes da API (health, webhook, sandra)
-â”‚   â”œâ”€â”€ test_pipeline.py         # 5 testes de integraÃ§Ã£o (emulador â†’ parse â†’ dados)
+â”‚   â”œâ”€â”€ test_pipeline.py         # 5 testes de integração (emulador â†’ parse â†’ dados)
 â”‚   â””â”€â”€ mock_instrument.py       # Emulador ASTM CLI
 â”œâ”€â”€ Dockerfile                   # python:3.12-slim + uv sync
 â”œâ”€â”€ pyproject.toml               # uv: 5 deps runtime, 2 deps dev
-â”œâ”€â”€ .env.example                 # Template de variÃ¡veis de ambiente
+â”œâ”€â”€ .env.example                 # Template de variáveis de ambiente
 â””â”€â”€ spec-middleware.md           # Spec-first do projeto
 ```
 
 ---
 
-## VariÃ¡veis de Ambiente
+## Variáveis de Ambiente
 
-| VariÃ¡vel | Default | DescriÃ§Ã£o |
+| Variável | Default | Descrição |
 |----------|---------|-----------|
 | `SENAITE_URL` | `http://localhost:8083/senaite` | URL base do SENAITE |
-| `SENAITE_USER` | `admin` | UsuÃ¡rio da API |
+| `SENAITE_USER` | `admin` | Usuário da API |
 | `SENAITE_PASSWORD` | `admin` | Senha da API |
 | `DB_HOST` | `localhost` | PostgreSQL CATSERV |
 | `DB_PORT` | `5433` | Porta do PostgreSQL |
 | `DB_NAME` | `financeiro` | Database CATSERV |
-| `DB_USER` | `catserv` | UsuÃ¡rio CATSERV |
+| `DB_USER` | `catserv` | Usuário CATSERV |
 | `DB_PASSWORD` | `catserv_secret` | Senha CATSERV |
 | `HOST` | `0.0.0.0` | Bind do gateway |
 | `PORT` | `8000` | Porta do gateway |
-| `LOG_LEVEL` | `info` | NÃ­vel de log |
+| `LOG_LEVEL` | `info` | Nível de log |
 
 ---
 
-## DependÃªncias
+## Dependências
 
 **Runtime** (5): `fastapi`, `httpx`, `pydantic`, `pydantic-settings`, `uvicorn`
 **Dev** (2): `pytest`, `pytest-asyncio`
 
-Gerenciadas exclusivamente via `uv add` / `uv sync` â€” sem `pip install` manual.
+Gerenciadas exclusivamente via `uv add` / `uv sync` ” sem `pip install` manual.
 
 ---
 
 ## Notas Operacionais
 
-- **APIs ExÃ©rcito**: SANDRA, CADBEN e SIRE estÃ£o em modo mock atÃ© assinatura de termo de sigilo.
-- **CATSERV**: PostgreSQL com tabela `tabela_catserv` mapeia cÃ³digos de exame â†’ UIDs do SENAITE.
+- **APIs Exército**: SANDRA, CADBEN e SIRE estão em modo mock até assinatura de termo de sigilo.
+- **CATSERV**: PostgreSQL com tabela `tabela_catserv` mapeia códigos de exame â†’ UIDs do SENAITE.
 - **Volume ZODB**: O banco do SENAITE (`Data.fs`) persiste em volume nomeado `senaite_data:/data`.
-- **Buildout**: NÃ£o use `SITE=senaite` em restarts â€” destrÃ³i `package-includes/` do add-on custom.
-- **Webhook SENAITE**: Implementado via Event Subscriber ZCML (nÃ£o painel webhooks). Dispara POST para o gateway ao publicar laudo.
+- **Buildout**: Não use `SITE=senaite` em restarts ” destrói `package-includes/` do add-on custom.
+- **Webhook SENAITE**: Implementado via Event Subscriber ZCML (não painel webhooks). Dispara POST para o gateway ao publicar laudo.
